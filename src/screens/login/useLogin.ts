@@ -48,46 +48,41 @@ export default function useLogin() {
   });
 
   const formData: formDataProps = [
-    {
-      inputType: 'drop-down',
-      name: 'url',
-      dropdownProps: {
-        placeholder: 'Enter url',
-        searchTextInputProps: {
-          autoCapitalize: 'none',
-          placeholder: 'Enter url',
-        },
-        options: accounts?.url,
-      },
-      rules: {
-        required: {
-          value: true,
-          message: 'Url is required',
-        },
+    // {
+    //   inputType: 'drop-down',
+    //   name: 'url',
+    //   dropdownProps: {
+    //     placeholder: 'Enter url',
+    //     searchTextInputProps: {
+    //       autoCapitalize: 'none',
+    //       placeholder: 'Enter url',
+    //     },
+    //     options: accounts?.url,
+    //   },
+    //   rules: {
+    //     required: {
+    //       value: true,
+    //       message: 'Url is required',
+    //     },
 
-        validate(val) {
-          console.log('val: ', val);
-          return /^(https?:\/\/)[^\s"]+$/.test(val?.label)
-            ? true
-            : 'Enter valid url';
-        },
-      },
-    },
+    //     validate(val) {
+    //       console.log('val: ', val);
+    //       return /^(https?:\/\/)[^\s"]+$/.test(val?.label)
+    //         ? true
+    //         : 'Enter valid url';
+    //     },
+    //   },
+    // },
     {
-      inputType: 'drop-down',
-      name: 'email',
-      dropdownProps: {
-        placeholder: 'Enter email',
-        searchTextInputProps: {
-          autoCapitalize: 'none',
-          placeholder: 'Enter email',
-        },
-        options: accounts?.login,
+      inputType: 'input-box',
+      name: 'username',
+      textInputProps: {
+        placeholder: 'Enter username',
       },
       rules: {
         required: {
           value: true,
-          message: 'Email is required',
+          message: 'Username is required',
         },
       },
     },
@@ -139,6 +134,9 @@ export default function useLogin() {
   };
 
   const onLogin = (data: any) => {
+    dispatch(updateAuthSlice({ key: 'isLogin', value: true }));
+
+    return;
     mutate(
       {
         data: { email: data?.email?.value, pin: data?.pin },

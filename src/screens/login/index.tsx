@@ -1,5 +1,8 @@
-import { ScrollView, TouchableOpacity, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
+import HMAAvatar from 'src/components/styled/atoms/avatar';
 import HMAButton from 'src/components/styled/atoms/button';
+import HMACard from 'src/components/styled/atoms/card';
+import HMACheckBox from 'src/components/styled/atoms/checkbox';
 import Container from 'src/components/styled/atoms/container';
 import HMADivider from 'src/components/styled/atoms/divider';
 import HMAText from 'src/components/styled/atoms/text';
@@ -7,12 +10,9 @@ import HMAForm from 'src/components/styled/organism/form';
 import HMAAlert from 'src/components/styled/template/modal/alert';
 import { useTheme } from 'src/hooks/useTheme';
 import { cStyle } from 'src/utils/style';
-import { SCREEN_WIDTH } from 'src/utils/variables';
+import { APP_NAME, SCREEN_WIDTH } from 'src/utils/variables';
 import { loginStyle } from './style';
 import useLogin from './useLogin';
-import HMAAvatar from 'src/components/styled/atoms/avatar';
-import HMACard from 'src/components/styled/atoms/card';
-import HMACheckBox from 'src/components/styled/atoms/checkbox';
 
 export default function Login() {
   const { colors, spacing, metrics } = useTheme();
@@ -41,19 +41,9 @@ export default function Login() {
           },
         ]}
       >
-        <HMACard
-          style={[
-            {
-              padding: spacing.md,
-              borderRadius: 500,
-            },
-          ]}
-        >
-          <HMAAvatar
-            source={require('src/assets/images/attendo-logo.png')}
-            size="lg"
-          />
-        </HMACard>
+        <HMAText color="background" size="title">
+          {APP_NAME}
+        </HMAText>
       </View>
       <View
         style={{
