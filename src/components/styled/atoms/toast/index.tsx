@@ -3,6 +3,7 @@ import { useTheme } from 'src/hooks/useTheme';
 import HMAText from '../text';
 import { Ref, useEffect, useImperativeHandle, useState } from 'react';
 import { colors } from 'src/theme/colors';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type colorKey = keyof typeof colors;
 export type toastRefFn = {
@@ -21,6 +22,7 @@ export default function Toast({ showMs = 4000, ...props }: ToastProps) {
   const [message, setMessage] = useState('');
   const [isShowTimer, setIsShowTimer] = useState(false);
   const [color, setColor] = useState<colorKey>('info');
+  const { top } = useSafeAreaInsets();
 
   useImperativeHandle(props?.ref, () => ({
     showToast: (msg?: string, type?: colorKey) => {
@@ -47,6 +49,7 @@ export default function Toast({ showMs = 4000, ...props }: ToastProps) {
     return (
       <View
         style={{
+          paddingTop: top,
           padding: spacing.xs,
           backgroundColor: colors[color],
           position: 'absolute',

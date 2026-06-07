@@ -1,53 +1,42 @@
-import Container from 'src/components/styled/atoms/container';
-import withLocation from 'src/hoc/withLocation';
-import MapView, { Marker } from 'react-native-maps';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { View } from 'react-native';
-import HMACard from 'src/components/styled/atoms/card';
-import { useTheme } from 'src/hooks/useTheme';
-import HMAText from 'src/components/styled/atoms/text';
+import MapView, { Polyline } from 'react-native-maps';
 import HMAButton from 'src/components/styled/atoms/button';
+import Container from 'src/components/styled/atoms/container';
+import HMAText from 'src/components/styled/atoms/text';
 import HMAModalTemplate from 'src/components/styled/template/modal';
-import useLiveLocation from 'src/hooks/useLiveLocation';
+import { checkLocationEnabled } from 'src/function/locationPermission';
+import withLocation from 'src/hoc/withLocation';
+import { useTheme } from 'src/hooks/useTheme';
+import useTracker from './useTracker';
+import HMADivider from 'src/components/styled/atoms/divider';
+import Toast from 'src/components/styled/atoms/toast';
 
-function Tracker({ position, navigation }) {
-  const mapRef = useRef(null);
+function Tracker() {
   const { spacing, colors, metrics } = useTheme();
-  const [isStart, setIsStart] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const { location } = useLiveLocation();
-
-  const userLocation = useMemo(
-    () => ({
-      latitude: location?.latitude || position?.coords?.latitude || 0,
-      longitude: location?.longitude || position?.coords?.longitude || 0,
-    }),
-    [location, position],
-  );
-
-  const onEnd = () => {
-    navigation.navigate('Trip Details');
-    setIsOpen(false);
-  };
-
-  const onStart = () => {
-    setIsStart(true);
-    setIsOpen(false);
-  };
+  const {
+    isOpen,
+    isStart,
+    mapRef,
+    onEnd,
+    onStart,
+    routeCoords,
+    setIsOpen,
+    toastRef,
+  } = useTracker();
 
   useEffect(() => {
-    if (userLocation && mapRef.current) {
+    checkLocationEnabled().then(location => {
       mapRef?.current?.animateToRegion?.(
         {
-          latitude: userLocation.latitude,
-          longitude: userLocation.longitude,
+          ...location?.coords,
           latitudeDelta: 0.01,
           longitudeDelta: 0.01,
         },
         1000,
-      ); // 1000ms animation duration
-    }
-  }, [userLocation]);
+      );
+    });
+  }, []);
 
   return (
     <Container padding={0}>
@@ -70,16 +59,20 @@ function Tracker({ position, navigation }) {
           </HMAText>
         </View>
         <MapView
+          showsUserLocation
+          followsUserLocation
           ref={mapRef}
           style={[{ flex: 1 }]}
-          initialRegion={{
-            latitude: userLocation?.latitude,
-            longitude: userLocation?.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
-        />
+        >
+          <Polyline
+            coordinates={routeCoords}
+            strokeColor="#E85D24"
+            strokeWidth={4}
+          />
+        </MapView>
         <View style={{ padding: spacing.md }}>
+          <HMAText variant="title">Trip Start Time: 9:50AM</HMAText>
+          <HMADivider />
           {isStart ? (
             <HMAButton onPress={() => setIsOpen(true)} title="End Trip" />
           ) : (
@@ -101,9 +94,9 @@ function Tracker({ position, navigation }) {
           onPress: () => (isStart ? onEnd() : onStart()),
         }}
       />
+      <Toast ref={toastRef} />
     </Container>
   );
 }
 
-// export default withLocation(Tracker);
-export default Tracker;
+export default withLocation(Tracker);
