@@ -11,6 +11,8 @@ import { useTheme } from 'src/hooks/useTheme';
 import useTracker from './useTracker';
 import HMADivider from 'src/components/styled/atoms/divider';
 import Toast from 'src/components/styled/atoms/toast';
+import useBackHandle from 'src/hooks/useBackHandle';
+import TripInProgress from 'src/components/layout/tripInPrograss';
 
 function Tracker() {
   const { spacing, colors, metrics } = useTheme();
@@ -94,7 +96,8 @@ function Tracker() {
           onPress: () => (isStart ? onEnd() : onStart()),
         }}
       />
-      <Toast ref={toastRef} />
+      <Toast ref={toastRef} showMs={10000} />
+      <TripInProgress isTripStarted={isStart} />
     </Container>
   );
 }
