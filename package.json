@@ -29,6 +29,7 @@
     "react-native": "0.85.3",
     "react-native-android-location-enabler": "^3.0.1",
     "react-native-date-picker": "^5.0.13",
+    "react-native-device-info": "^15.0.2",
     "react-native-gesture-handler": "^3.0.0",
     "react-native-maps": "^1.27.2",
     "react-native-modal": "^14.0.0-rc.1",

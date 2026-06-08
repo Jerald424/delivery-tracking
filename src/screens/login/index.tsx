@@ -13,18 +13,11 @@ import { cStyle } from 'src/utils/style';
 import { APP_NAME, SCREEN_WIDTH } from 'src/utils/variables';
 import { loginStyle } from './style';
 import useLogin from './useLogin';
+import Authenticate from './Authenticate';
 
 export default function Login() {
   const { colors, spacing, metrics } = useTheme();
-  const {
-    control,
-    formData,
-    handleSubmit,
-    isPending,
-    alertRef,
-    isRemember,
-    setIsRemember,
-  } = useLogin();
+  const { control, formData, handleSubmit, isPending, alertRef } = useLogin();
 
   return (
     <Container
@@ -70,16 +63,7 @@ export default function Login() {
           </HMAText>
           <HMADivider space={'md'} />
           <HMAForm data={formData} control={control} />
-          <View style={[cStyle.rowAlign]}>
-            <HMACheckBox
-              hitSlop={20}
-              value={isRemember}
-              onChange={() => setIsRemember(!isRemember)}
-            />
-            <HMAText style={{ flex: 1, marginLeft: spacing.md }}>
-              Remember me
-            </HMAText>
-          </View>
+
           <HMADivider space={'md'} />
 
           <HMAButton
@@ -87,6 +71,7 @@ export default function Login() {
             title="Login"
             onPress={handleSubmit}
           />
+          <Authenticate />
         </ScrollView>
       </View>
       <HMAAlert ref={alertRef} />

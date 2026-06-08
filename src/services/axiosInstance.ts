@@ -4,7 +4,7 @@ import { IS_ANDROID } from 'src/utils/variables';
 
 const axiosInstance = axios.create({
   timeout: 60000,
-  // baseURL: 'https://bse-testing.odoo.com',
+  baseURL: 'http://72.60.204.24:8069',
   headers: {
     ['Content-Type']: 'application/json',
     Accept: 'application/json',

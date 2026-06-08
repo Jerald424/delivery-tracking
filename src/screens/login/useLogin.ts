@@ -37,8 +37,6 @@ export const assignBaseURlToAsyncStorage = (url: string) => {
 };
 
 export default function useLogin() {
-  const [accounts, setAccounts] = useState({ url: [], email: [] });
-  const [isRemember, setIsRemember] = useState(true);
   const dispatch = useAppDispatch();
   const alertRef = useRef<alertRefProp>(null);
   const { control, handleSubmit, reset } = useForm();
@@ -88,7 +86,7 @@ export default function useLogin() {
     },
     {
       inputType: 'input-box',
-      name: 'pin',
+      name: 'password',
       textInputProps: {
         placeholder: 'Enter password',
         secureTextEntry: true,
@@ -103,76 +101,31 @@ export default function useLogin() {
     },
   ];
 
-  const assignAccountsToAS = async (data: any) => {
-    try {
-      let acVal = accounts;
-      if (!acVal?.url?.some(ac => ac?.value == data?.url?.value))
-        acVal?.url.push(data?.url);
-      if (!acVal?.email?.some(ac => ac?.value == data?.email?.value))
-        acVal?.email.push(data?.email);
-      await AsyncStorage.setItem(ACCOUNTS, JSON.stringify(acVal));
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
-  const revokeAccounts = async () => {
-    try {
-      let acVal = await AsyncStorage.getItem(ACCOUNTS);
-      if (!!acVal) {
-        acVal = JSON.parse(acVal);
-        console.log('acVal: ', acVal);
-        reset({
-          url: acVal?.url?.pop?.(),
-          email: acVal?.email?.pop?.(),
-        });
-        setAccounts(acVal);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
   const onLogin = (data: any) => {
-    dispatch(updateAuthSlice({ key: 'isLogin', value: true }));
+    // dispatch(updateAuthSlice({ key: 'isLogin', value: true }));
 
-    return;
-    mutate(
-      {
-        data: { email: data?.email?.value, pin: data?.pin },
-        baseURL: data?.url?.value,
+    mutate(data, {
+      onError(error) {
+        console.log('error: ', error);
+        alertRef?.current?.showAlert?.({
+          message: error?.Message ?? 'Something went wrong',
+        });
       },
-      {
-        onError(error) {
-          console.log('error: ', error);
-          alertRef?.current?.showAlert?.({
-            message: error?.Message ?? 'Something went wrong',
+      onSuccess(response) {
+        console.log('RESPONSE: ', response);
+        if (response?.result?.status != 200)
+          return alertRef?.current?.showAlert?.({
+            message: response?.result?.error ?? 'Something went wrong',
           });
-        },
-        onSuccess(response) {
-          if (response?.result?.status != 'success')
-            return alertRef?.current?.showAlert?.({
-              message: response?.result?.message ?? 'Something went wrong',
-            });
-          console.log('#########################', response);
-          if (isRemember) assignAccountsToAS(data);
-          dispatch(
-            updateAuthSlice({ key: 'baseurl', value: data?.url?.value }),
-          );
-          assignBaseURlToAsyncStorage(data?.url?.value);
-          assignBaseURlToAxios(data?.url?.value);
-          AsyncStorage.setItem(LOGIN_DATA, JSON.stringify(response));
-          assignTokenToAsyncStorage(response?.result?.token);
-          assignTokenToAxios(response?.result?.token);
-          dispatch(updateAuthSlice({ key: 'isLogin', value: true }));
-        },
-      },
-    );
-  };
+        console.log('#########################', response);
 
-  useEffect(() => {
-    revokeAccounts();
-  }, []);
+        AsyncStorage.setItem(LOGIN_DATA, JSON.stringify(response));
+        assignTokenToAsyncStorage(response?.result?.token);
+        assignTokenToAxios(response?.result?.token);
+        dispatch(updateAuthSlice({ key: 'isLogin', value: true }));
+      },
+    });
+  };
 
   return {
     formData,
@@ -180,7 +133,5 @@ export default function useLogin() {
     handleSubmit: handleSubmit(onLogin),
     isPending,
     alertRef,
-    isRemember,
-    setIsRemember,
   };
 }
