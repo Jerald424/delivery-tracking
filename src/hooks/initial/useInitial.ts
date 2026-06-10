@@ -21,16 +21,12 @@ export default function useInitial() {
 
   const checkToken = async () => {
     const token = await AsyncStorage.getItem(TOKEN);
-    const url = await AsyncStorage.getItem(BASE_URL);
-    if (token && url) {
+    if (token) {
       verifyMutate(
-        { token, url },
+        { token },
         {
           onSuccess(response) {
             console.log('response: ', response);
-            dispatch(updateAuthSlice({ key: 'baseurl', value: url }));
-            assignBaseURlToAsyncStorage(url);
-            assignBaseURlToAxios(url);
             assignTokenToAxios(token);
             dispatch(updateAuthSlice({ key: 'isLogin', value: true }));
           },
@@ -39,7 +35,7 @@ export default function useInitial() {
           },
           onError(error) {
             console.log('ERROR: ', error);
-            AsyncStorage.multiRemove([TOKEN, LOGIN_DATA]);
+            AsyncStorage.removeMany([TOKEN, LOGIN_DATA]);
           },
         },
       );

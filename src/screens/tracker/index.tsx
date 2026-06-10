@@ -1,18 +1,18 @@
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import MapView, { Polyline } from 'react-native-maps';
+import TripInProgress from 'src/components/layout/tripInPrograss';
 import HMAButton from 'src/components/styled/atoms/button';
 import Container from 'src/components/styled/atoms/container';
+import HMADivider from 'src/components/styled/atoms/divider';
 import HMAText from 'src/components/styled/atoms/text';
+import Toast from 'src/components/styled/atoms/toast';
 import HMAModalTemplate from 'src/components/styled/template/modal';
 import { checkLocationEnabled } from 'src/function/locationPermission';
 import withLocation from 'src/hoc/withLocation';
 import { useTheme } from 'src/hooks/useTheme';
 import useTracker from './useTracker';
-import HMADivider from 'src/components/styled/atoms/divider';
-import Toast from 'src/components/styled/atoms/toast';
-import useBackHandle from 'src/hooks/useBackHandle';
-import TripInProgress from 'src/components/layout/tripInPrograss';
+import HMAModalLoader from 'src/components/styled/molecules/loader/modalLoader';
 
 function Tracker() {
   const { spacing, colors, metrics } = useTheme();
@@ -25,19 +25,30 @@ function Tracker() {
     routeCoords,
     setIsOpen,
     toastRef,
+    isLoadingTripStart,
+    isLoadingFetchLatLon,
+    lastActiveTrip,
+    resumeTrip,
   } = useTracker();
 
   useEffect(() => {
-    checkLocationEnabled().then(location => {
-      mapRef?.current?.animateToRegion?.(
-        {
-          ...location?.coords,
-          latitudeDelta: 0.01,
-          longitudeDelta: 0.01,
-        },
-        1000,
-      );
-    });
+    if (lastActiveTrip) resumeTrip();
+  }, [lastActiveTrip]);
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      checkLocationEnabled().then(location => {
+        mapRef?.current?.animateToRegion?.(
+          {
+            ...location?.coords,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          },
+          1000,
+        );
+      });
+
+      return () => clearTimeout(timer);
+    }, 300);
   }, []);
 
   return (
@@ -98,6 +109,7 @@ function Tracker() {
       />
       <Toast ref={toastRef} showMs={10000} />
       <TripInProgress isTripStarted={isStart} />
+      <HMAModalLoader isVisible={isLoadingTripStart || isLoadingFetchLatLon} />
     </Container>
   );
 }

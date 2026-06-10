@@ -1,7 +1,15 @@
 import Geolocation from '@react-native-community/geolocation';
 import { useNavigation } from '@react-navigation/native';
+import { useMutation } from '@tanstack/react-query';
 import { useRef, useState } from 'react';
 import { toastRefFn } from 'src/components/styled/atoms/toast';
+import {
+  makeJsDateToFormatDate,
+  startTripApi,
+  updateLocationApi,
+} from './apis';
+import { checkLocationEnabled } from 'src/function/locationPermission';
+import useActiveTrip from './hooks/useActiveTrip';
 
 const getDistance = (coord1, coord2) => {
   const R = 6371000;
@@ -17,6 +25,8 @@ const getDistance = (coord1, coord2) => {
 
 const MIN_DISTANCE_METRES = 50; // only add point if moved at least 5m
 const interval = 60000;
+const delay = (ms: number) =>
+  new Promise(resolve => setTimeout(() => resolve('OK'), ms));
 
 export default function useTracker() {
   const mapRef = useRef(null);
@@ -26,14 +36,52 @@ export default function useTracker() {
   const watcherId = useRef<any>(null);
   const navigation = useNavigation();
   const toastRef = useRef<toastRefFn>(null);
+  const lastActiveTrip = useActiveTrip();
+
+  const { mutate: startTripMutate, isPending: isLoadingTripStart } =
+    useMutation({
+      mutationKey: ['start/trip'],
+      mutationFn: startTripApi,
+    });
+  const {
+    mutate: updateLocationApiMutate,
+    isPending: isLoadingUpdateLocation,
+  } = useMutation({
+    mutationKey: ['update/location'],
+    mutationFn: updateLocationApi,
+  });
+
+  const { mutate: fetchLatLon, isPending: isLoadingFetchLatLon } = useMutation({
+    mutationKey: ['fetch/lat-long'],
+    mutationFn: checkLocationEnabled,
+  });
+
   console.log('routeCoords: ', routeCoords);
 
   const onEnd = () => {
-    navigation.replace('Trip Details');
+    watcherId.current = null;
     setIsOpen(false);
+
+    navigation.replace('Trip Details');
   };
 
   const onAddNewCoords = (points: any) => {
+    toastRef.current?.showToast?.('Location updated', 'info');
+    console.log('NEW LAT ADDED');
+    const payload = {
+      ...points,
+      tracking_time: makeJsDateToFormatDate(),
+      trip_id: lastActiveTrip?.trip_id,
+    };
+    console.log('PAYLOAD: ', payload);
+    updateLocationApiMutate(payload, {
+      onSuccess(data) {
+        console.log('LOCATION UPDATED', data);
+      },
+      onError(error) {
+        console.log('ERROR WHILE UPDATE LOCATION', error);
+      },
+    });
     mapRef?.current?.animateToRegion?.(
       {
         ...points,
@@ -44,14 +92,21 @@ export default function useTracker() {
     );
   };
 
-  const onStart = () => {
+  const onTripStarted = async (arg?: { isResume?: boolean }) => {
     setIsStart(true);
-    setIsOpen(false);
-    setRouteCoords([]);
-    toastRef.current?.showToast?.('Your trip started successfully', 'success');
+    console.log('ON TRIP STARTED', arg);
 
+    toastRef.current?.showToast?.(
+      arg?.isResume
+        ? 'Your trip was resumed..'
+        : 'Your trip started successfully',
+      'success',
+    );
+    await delay(2000);
+    watcherId.current = null;
     watcherId.current = Geolocation.watchPosition(
-      ({ coords }) => {
+      location => {
+        const { coords } = location;
         console.log('coords: ', coords);
         const newPoint = {
           latitude: coords.latitude,
@@ -67,7 +122,7 @@ export default function useTracker() {
 
             if (dist < MIN_DISTANCE_METRES) return prev; // ignore, hasn't moved enough
           }
-          onAddNewCoords(newPoint);
+          onAddNewCoords(coords);
           return [...prev, newPoint];
         });
       },
@@ -84,6 +139,53 @@ export default function useTracker() {
     );
   };
 
+  const updateStartTrip = () => {
+    fetchLatLon(
+      {},
+      {
+        onSuccess(location) {
+          console.log('FETCH ON TRIP START', location);
+          startTripMutate(
+            {
+              latitude: location?.coords?.latitude,
+              longitude: location?.coords?.longitude,
+            },
+            {
+              onSuccess(success) {
+                console.log('TRIP STARTED: ', success);
+
+                if (success?.result?.status !== 200) {
+                  toastRef.current?.showToast?.(
+                    success?.result?.error ?? 'Something went wrong',
+                    'error',
+                  );
+
+                  return;
+                }
+                onTripStarted();
+              },
+              onError(error) {
+                console.log('ERROR : TRIP STARTED: ', error);
+              },
+            },
+          );
+        },
+      },
+    );
+  };
+
+  const onStart = () => {
+    setIsOpen(false);
+    setRouteCoords([]);
+
+    updateStartTrip();
+  };
+
+  const resumeTrip = () => {
+    setRouteCoords(lastActiveTrip?.lat_longs as any);
+    onTripStarted({ isResume: true });
+  };
+
   return {
     onEnd,
     onStart,
@@ -93,5 +195,9 @@ export default function useTracker() {
     routeCoords,
     setIsOpen,
     toastRef,
+    isLoadingTripStart,
+    isLoadingFetchLatLon,
+    lastActiveTrip,
+    resumeTrip,
   };
 }

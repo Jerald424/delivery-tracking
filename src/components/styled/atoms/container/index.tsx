@@ -32,12 +32,7 @@ export default function Container({
         props?.style,
       ]}
     >
-      <SafeAreaView
-        {...safeAreaViewProps}
-        style={[{ flex: 1 ,}, safeAreaViewProps?.style]}
-      >
-        {props?.children}
-      </SafeAreaView>
+      {props?.children}
     </View>
   );
 }

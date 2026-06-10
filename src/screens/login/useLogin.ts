@@ -76,6 +76,7 @@ export default function useLogin() {
       name: 'username',
       textInputProps: {
         placeholder: 'Enter username',
+        autoCapitalize: 'none',
       },
       rules: {
         required: {
@@ -108,7 +109,7 @@ export default function useLogin() {
       onError(error) {
         console.log('error: ', error);
         alertRef?.current?.showAlert?.({
-          message: error?.Message ?? 'Something went wrong',
+          message: error?.message ?? 'Something went wrong',
         });
       },
       onSuccess(response) {
