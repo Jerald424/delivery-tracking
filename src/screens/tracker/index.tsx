@@ -27,14 +27,16 @@ function Tracker() {
     toastRef,
     isLoadingTripStart,
     isLoadingFetchLatLon,
-    lastActiveTrip,
+    lastTripDetails,
     resumeTrip,
+    refetchLastTrip,
   } = useTracker();
 
   useEffect(() => {
-    if (lastActiveTrip) resumeTrip();
-  }, [lastActiveTrip]);
+    if (lastTripDetails?.has_active_trip) resumeTrip();
+  }, [lastTripDetails]);
   useEffect(() => {
+    refetchLastTrip();
     const timer = setTimeout(() => {
       checkLocationEnabled().then(location => {
         mapRef?.current?.animateToRegion?.(

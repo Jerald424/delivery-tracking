@@ -1,25 +1,26 @@
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert, ScrollView, View } from 'react-native';
+import { Alert, ScrollView } from 'react-native';
 import TripInProgress from 'src/components/layout/tripInPrograss';
 import HMAButton from 'src/components/styled/atoms/button';
 import HMACard from 'src/components/styled/atoms/card';
 import Container from 'src/components/styled/atoms/container';
 import HMADivider from 'src/components/styled/atoms/divider';
 import HMAText from 'src/components/styled/atoms/text';
+import HMAModalLoader from 'src/components/styled/molecules/loader/modalLoader';
 import HMAForm, { formDataProps } from 'src/components/styled/organism/form';
+import { checkLocationEnabled } from 'src/function/locationPermission';
 import { useTheme } from 'src/hooks/useTheme';
 import { endTripApi } from './api';
-import HMAModalLoader from 'src/components/styled/molecules/loader/modalLoader';
-import { checkLocationEnabled } from 'src/function/locationPermission';
 import useActiveTrip from '../tracker/hooks/useActiveTrip';
 
-export default function TripDetails({ navigation }) {
+export default function TripDetails({ navigation, route }) {
+  const params = route?.params;
   const { control, handleSubmit } = useForm();
   const { spacing, metrics, colors } = useTheme();
   const [isSelected, setIsSelected] = useState('toll');
-  const activeTrip = useActiveTrip();
+  const { refetch } = useActiveTrip();
   const { mutate, isPending } = useMutation({
     mutationKey: ['end/trip'],
     mutationFn: endTripApi,
@@ -81,13 +82,15 @@ export default function TripDetails({ navigation }) {
               expenses,
               ...location?.coords,
             },
-            trip_id: activeTrip?.trip_id,
+            trip_id: params?.trip_id,
           };
           console.log('payload: ', payload);
           mutate(payload, {
             onSuccess(data) {
+              refetch().then(() => {
+                navigation?.replace('Dashboard');
+              });
               console.log('data: ', data);
-              navigation?.replace('Dashboard');
             },
             onError(error) {
               Alert.alert('ERROR: ', JSON.stringify(error));

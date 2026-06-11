@@ -71,7 +71,7 @@ export default function Login() {
             title="Login"
             onPress={handleSubmit}
           />
-          <Authenticate />
+          {/* <Authenticate /> */}
         </ScrollView>
       </View>
       <HMAAlert ref={alertRef} />

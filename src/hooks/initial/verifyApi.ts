@@ -1,19 +1,17 @@
 import axiosInstance from 'src/services/axiosInstance';
-import { TOKEN } from 'src/utils/variables';
 
 export default async function verifyApi({ token }: { token: string }) {
-  // const response = await axiosInstance.post(
-  //   `${url}/api/employee/verify-token`,
-  //   {
-  //     params: {},
-  //   },
-  //   {
-  //     headers: {
-  //       Authorization: `Bearer ${token}`,
-  //     },
-  //   },
-  // );
-  return {
-    status: 200,
-  };
+  const response = await axiosInstance.post(
+    `/api/token/verify`,
+    {
+      params: { token },
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    },
+  );
+  if (response?.result?.status !== 200) throw new Error('Session expires');
+  return response;
 }

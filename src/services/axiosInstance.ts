@@ -6,6 +6,7 @@ const axiosInstance = axios.create({
   timeout: 60000,
   baseURL: 'http://72.60.204.24:8069',
   headers: {
+    ['X-Odoo-Database']: 'allwin_watertank',
     ['Content-Type']: 'application/json',
     Accept: 'application/json',
     version: 1.2,
@@ -16,7 +17,11 @@ const axiosInstance = axios.create({
 
 axiosInstance.interceptors.response.use(
   response => {
-    if (response?.data?.result?.status == 401) sessionExpires();
+    if (
+      !response?.config?.url?.includes('/login') &&
+      response?.data?.result?.status == 401
+    )
+      sessionExpires();
     if (response?.data?.result?.status == 'error')
       return Promise.reject(response?.data);
     return response?.data;

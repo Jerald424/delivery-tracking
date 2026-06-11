@@ -29,6 +29,7 @@ export default function useInitial() {
             console.log('response: ', response);
             assignTokenToAxios(token);
             dispatch(updateAuthSlice({ key: 'isLogin', value: true }));
+            dispatch(updateAuthSlice({ key: 'token', value: token }));
           },
           onSettled() {
             setIsReady(true);

@@ -1,27 +1,14 @@
-import { useState } from 'react';
+import { useActiveTripState, useAppDispatch } from 'src/redux/hooks';
+import { fetchLastActiveTrip } from 'src/redux/slices/activeTrip/thunk';
 
 export default function useActiveTrip() {
-  const [val] = useState({
-    trip_id: 1,
-    time: '9:50 AM',
-    lat_longs: [
-      {
-        longitude: 80.239625,
-        latitude: 12.963,
-      },
-      {
-        longitude: 80.239628,
-        latitude: 12.969,
-      },
-      {
-        longitude: 80.23963,
-        latitude: 12.972,
-      },
-      {
-        longitude: 80.239,
-        latitude: 12.9,
-      },
-    ],
-  });
-  return val;
+  const { data } = useActiveTripState();
+
+  const dispatch = useAppDispatch();
+
+  console.log('data: ', data);
+  return {
+    data: data?.result,
+    refetch: () => dispatch(fetchLastActiveTrip()),
+  };
 }

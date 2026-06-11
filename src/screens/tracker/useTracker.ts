@@ -36,7 +36,8 @@ export default function useTracker() {
   const watcherId = useRef<any>(null);
   const navigation = useNavigation();
   const toastRef = useRef<toastRefFn>(null);
-  const lastActiveTrip = useActiveTrip();
+  const { data: lastTripDetails, refetch: refetchLastTrip } = useActiveTrip();
+  console.log('lastTripDetails: ', lastTripDetails);
 
   const { mutate: startTripMutate, isPending: isLoadingTripStart } =
     useMutation({
@@ -62,7 +63,9 @@ export default function useTracker() {
     watcherId.current = null;
     setIsOpen(false);
 
-    navigation.replace('Trip Details');
+    navigation.replace('Trip Details', {
+      trip_id: lastTripDetails?.active_trip?.trip_id,
+    });
   };
 
   const onAddNewCoords = (points: any) => {
@@ -71,7 +74,7 @@ export default function useTracker() {
     const payload = {
       ...points,
       tracking_time: makeJsDateToFormatDate(),
-      trip_id: lastActiveTrip?.trip_id,
+      trip_id: lastTripDetails?.active_trip?.trip_id,
     };
     console.log('PAYLOAD: ', payload);
     updateLocationApiMutate(payload, {
@@ -167,6 +170,9 @@ export default function useTracker() {
               onError(error) {
                 console.log('ERROR : TRIP STARTED: ', error);
               },
+              onSettled() {
+                refetchLastTrip();
+              },
             },
           );
         },
@@ -182,7 +188,7 @@ export default function useTracker() {
   };
 
   const resumeTrip = () => {
-    setRouteCoords(lastActiveTrip?.lat_longs as any);
+    setRouteCoords(lastTripDetails?.active_trip?.routes ?? ([] as any));
     onTripStarted({ isResume: true });
   };
 
@@ -197,7 +203,8 @@ export default function useTracker() {
     toastRef,
     isLoadingTripStart,
     isLoadingFetchLatLon,
-    lastActiveTrip,
+    lastTripDetails,
     resumeTrip,
+    refetchLastTrip,
   };
 }
