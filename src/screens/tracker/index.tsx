@@ -30,6 +30,7 @@ function Tracker() {
     lastTripDetails,
     resumeTrip,
     refetchLastTrip,
+    tripStartTime,
   } = useTracker();
 
   useEffect(() => {
@@ -86,7 +87,12 @@ function Tracker() {
           />
         </MapView>
         <View style={{ padding: spacing.md }}>
-          <HMAText variant="title">Trip Start Time: 9:50AM</HMAText>
+          {tripStartTime && (
+            <HMAText variant="title">
+              Trip Start Time: {tripStartTime?.date}
+              {`  `} {tripStartTime?.time}
+            </HMAText>
+          )}
           <HMADivider />
           {isStart ? (
             <HMAButton onPress={() => setIsOpen(true)} title="End Trip" />

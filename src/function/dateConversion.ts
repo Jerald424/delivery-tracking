@@ -10,6 +10,7 @@ export const formateDate = (date: string = '16/10/2025 15:03:53') => {
 
     const [dt, time] = date.split(' ');
     let [hour, min] = time.split(':').map(Number);
+    console.log('hour, min: ', hour, min);
 
     let meridiem = 'AM';
 
@@ -24,7 +25,10 @@ export const formateDate = (date: string = '16/10/2025 15:03:53') => {
 
     return {
       date: dt,
-      time: `${hour}:${String(min).padStart(2, '0')} ${meridiem}`,
+      time: `${String(hour).padStart(2, '0')}:${String(min).padStart(
+        2,
+        '0',
+      )} ${meridiem}`,
     };
   } catch (error) {
     console.log('formatDate error:', error);
@@ -91,14 +95,22 @@ export function convertUserTimeZone({
 
 export function jsDateToDDMMYYYY(date: Date) {
   try {
-    return [date.getDate(), date.getMonth() + 1, date.getFullYear()].join('/');
+    return [
+      String(date.getDate()).padStart(2, '0'),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      date.getFullYear(),
+    ].join('/');
   } catch (error) {
     console.error(error);
   }
 }
 export function jsDateToYYYYMMDD(date: Date) {
   try {
-    return [date.getFullYear(), date.getMonth() + 1, date.getDate()].join('-');
+    return [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, '0'),
+      String(date.getDate()).padStart(2, '0'),
+    ].join('-');
   } catch (error) {
     console.error(error);
   }

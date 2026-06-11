@@ -36,7 +36,11 @@ export default function useTracker() {
   const watcherId = useRef<any>(null);
   const navigation = useNavigation();
   const toastRef = useRef<toastRefFn>(null);
-  const { data: lastTripDetails, refetch: refetchLastTrip } = useActiveTrip();
+  const {
+    data: lastTripDetails,
+    refetch: refetchLastTrip,
+    tripStartTime,
+  } = useActiveTrip();
   console.log('lastTripDetails: ', lastTripDetails);
 
   const { mutate: startTripMutate, isPending: isLoadingTripStart } =
@@ -206,5 +210,6 @@ export default function useTracker() {
     lastTripDetails,
     resumeTrip,
     refetchLastTrip,
+    tripStartTime,
   };
 }
