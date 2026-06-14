@@ -31,6 +31,7 @@ function Tracker() {
     resumeTrip,
     refetchLastTrip,
     tripStartTime,
+    watcherId,
   } = useTracker();
 
   useEffect(() => {
@@ -52,6 +53,10 @@ function Tracker() {
 
       return () => clearTimeout(timer);
     }, 300);
+  }, []);
+
+  useEffect(() => {
+    return () => clearInterval(watcherId.current);
   }, []);
 
   return (

@@ -16,9 +16,14 @@ export default function useActiveTrip() {
     try {
       const date = jsDateToYYYYMMDD(new Date());
       const dt = formateDate(data?.result?.active_trip?.start_time);
-      console.log('#####', data?.result?.active_trip?.start_time);
+      const [strDate, strTime, meridiem] =
+        data?.result?.active_trip?.start_time?.split(' ');
       if (dt && dt?.date == date) dt['date'] = 'Today';
-      if (data?.result?.has_active_trip) return dt;
+      if (data?.result?.has_active_trip)
+        return {
+          date: dt?.date,
+          time: `${strTime} ${meridiem}`,
+        };
     } catch (error) {
       console.error(error);
     }

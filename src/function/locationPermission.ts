@@ -48,10 +48,22 @@ export const checkLocationEnabled = async () => {
       },
       error => {
         console.log('ERROR: ', error);
-        reject(error);
+        Geolocation.getCurrentPosition(
+          position => {
+            resolve(position);
+          },
+          error => {
+            reject(error);
+          },
+          {
+            enableHighAccuracy: false,
+            timeout: 60000,
+            maximumAge: 30000,
+          },
+        );
       },
       {
-        enableHighAccuracy: false,
+        enableHighAccuracy: true,
         timeout: 60000,
       },
     );

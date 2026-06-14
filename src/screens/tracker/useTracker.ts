@@ -64,7 +64,8 @@ export default function useTracker() {
   console.log('routeCoords: ', routeCoords);
 
   const onEnd = () => {
-    watcherId.current = null;
+    clearInterval(watcherId.current);
+    // watcherId.current = null;
     setIsOpen(false);
 
     navigation.replace('Trip Details', {
@@ -110,40 +111,25 @@ export default function useTracker() {
       'success',
     );
     await delay(2000);
-    watcherId.current = null;
-    watcherId.current = Geolocation.watchPosition(
-      location => {
-        const { coords } = location;
+    // watcherId.current = null;
+    clearInterval(watcherId.current);
+
+    watcherId.current = setInterval(() => {
+      checkLocationEnabled().then(location => {
+        console.log('location: ', location);
+        const coords = location?.coords;
         console.log('coords: ', coords);
         const newPoint = {
           latitude: coords.latitude,
           longitude: coords.longitude,
         };
 
+        onAddNewCoords(coords);
         setRouteCoords(prev => {
-          if (coords.accuracy > 20) return prev; // ignore points with >20m accuracy
-
-          if (prev.length > 0) {
-            const dist = getDistance(prev[prev.length - 1], newPoint);
-            console.log('dist:', dist);
-
-            if (dist < MIN_DISTANCE_METRES) return prev; // ignore, hasn't moved enough
-          }
-          onAddNewCoords(coords);
           return [...prev, newPoint];
         });
-      },
-      err => {
-        console.log('LAT, LONG ERROR: ', err);
-      },
-      {
-        enableHighAccuracy: false,
-        distanceFilter: MIN_DISTANCE_METRES,
-        interval,
-        fastestInterval: interval / 2,
-        timeout: 6000,
-      },
-    );
+      });
+    }, interval);
   };
 
   const updateStartTrip = () => {
@@ -211,5 +197,6 @@ export default function useTracker() {
     resumeTrip,
     refetchLastTrip,
     tripStartTime,
+    watcherId,
   };
 }
