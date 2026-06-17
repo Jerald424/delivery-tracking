@@ -53,6 +53,8 @@ export const checkLocationEnabled = async () => {
             resolve(position);
           },
           error => {
+            console.log('2nd ERROR: ', error);
+
             reject(error);
           },
           {

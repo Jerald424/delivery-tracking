@@ -13,6 +13,7 @@ import withLocation from 'src/hoc/withLocation';
 import { useTheme } from 'src/hooks/useTheme';
 import useTracker from './useTracker';
 import HMAModalLoader from 'src/components/styled/molecules/loader/modalLoader';
+import PreTripDetails from '../preTripDetails';
 
 function Tracker() {
   const { spacing, colors, metrics } = useTheme();
@@ -32,6 +33,7 @@ function Tracker() {
     refetchLastTrip,
     tripStartTime,
     watcherId,
+    tripInfo,
   } = useTracker();
 
   useEffect(() => {
@@ -59,6 +61,26 @@ function Tracker() {
     return () => clearInterval(watcherId.current);
   }, []);
 
+  if (!isStart)
+    return (
+      <>
+        <PreTripDetails
+          isLoadingTripStart={isLoadingTripStart || isLoadingFetchLatLon}
+          onStart={data => {
+            console.log('$$$$$$$$$$$$$$$$$$', data);
+            setIsOpen(true);
+            tripInfo.current = data;
+          }}
+        />
+        <TripConfirmation
+          isOpen={isOpen}
+          isStart={isStart}
+          onEnd={onEnd}
+          onStart={onStart}
+          setIsOpen={setIsOpen}
+        />
+      </>
+    );
   return (
     <Container padding={0}>
       <View
@@ -106,19 +128,12 @@ function Tracker() {
           )}
         </View>
       </View>
-      <HMAModalTemplate
-        isVisible={!!isOpen}
-        descriptionProps={{
-          children: `Are you sure do you want ${
-            isStart ? 'end' : 'start'
-          } trip`,
-        }}
-        cancelTextProps={{
-          onPress: () => setIsOpen(false),
-        }}
-        okTextProps={{
-          onPress: () => (isStart ? onEnd() : onStart()),
-        }}
+      <TripConfirmation
+        isOpen={isOpen}
+        isStart={isStart}
+        onEnd={onEnd}
+        onStart={onStart}
+        setIsOpen={setIsOpen}
       />
       <Toast ref={toastRef} showMs={10000} />
       <TripInProgress isTripStarted={isStart} />
@@ -126,5 +141,34 @@ function Tracker() {
     </Container>
   );
 }
+
+const TripConfirmation = ({
+  isOpen,
+  isStart,
+  onEnd,
+  onStart,
+  setIsOpen,
+}: {
+  isOpen: boolean;
+  isStart: boolean;
+  setIsOpen: any;
+  onEnd: any;
+  onStart: any;
+}) => {
+  return (
+    <HMAModalTemplate
+      isVisible={!!isOpen}
+      descriptionProps={{
+        children: `Are you sure do you want ${isStart ? 'end' : 'start'} trip`,
+      }}
+      cancelTextProps={{
+        onPress: () => setIsOpen(false),
+      }}
+      okTextProps={{
+        onPress: () => (isStart ? onEnd() : onStart()),
+      }}
+    />
+  );
+};
 
 export default withLocation(Tracker);

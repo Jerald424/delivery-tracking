@@ -1,10 +1,16 @@
 import axiosInstance from 'src/services/axiosInstance';
 
-// {
-//  "params": {
-//  "latitude": 12.9716,
-//  "longitude": 77.5946
-//  }
+// "params": {
+//     "token": "9c34f4cb-45e5-471a-b833-75e80e67861d",
+//     "latitude": 11.34662,
+//     "longitude": 77.71909,
+//     "driver_id": 2,
+//     "bill_no": "BILL-2026-0099",
+//     "trip_from": "Erode Warehouse",
+//     "trip_to": "Salem Outlet",
+//     "item_text": "Spices and Organic Grains",
+//     "total_weight": 1250.5
+//   }
 // }
 export const startTripApi = (payload: any) => {
   return axiosInstance.post('/api/start-trip', {

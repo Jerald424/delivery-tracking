@@ -36,6 +36,7 @@ export default function useTracker() {
   const watcherId = useRef<any>(null);
   const navigation = useNavigation();
   const toastRef = useRef<toastRefFn>(null);
+  const tripInfo = useRef(null);
   const {
     data: lastTripDetails,
     refetch: refetchLastTrip,
@@ -138,33 +139,34 @@ export default function useTracker() {
       {
         onSuccess(location) {
           console.log('FETCH ON TRIP START', location);
-          startTripMutate(
-            {
-              latitude: location?.coords?.latitude,
-              longitude: location?.coords?.longitude,
-            },
-            {
-              onSuccess(success) {
-                console.log('TRIP STARTED: ', success);
+          const tripData = {
+            latitude: location?.coords?.latitude,
+            longitude: location?.coords?.longitude,
+            ...tripInfo?.current,
+            driver_id: tripInfo?.current?.driver_id?.id,
+          };
+          console.log('tripData: ', tripData);
+          startTripMutate(tripData, {
+            onSuccess(success) {
+              console.log('TRIP STARTED: ', success);
 
-                if (success?.result?.status !== 200) {
-                  toastRef.current?.showToast?.(
-                    success?.result?.error ?? 'Something went wrong',
-                    'error',
-                  );
+              if (success?.result?.status !== 200) {
+                toastRef.current?.showToast?.(
+                  success?.result?.error ?? 'Something went wrong',
+                  'error',
+                );
 
-                  return;
-                }
-                onTripStarted();
-              },
-              onError(error) {
-                console.log('ERROR : TRIP STARTED: ', error);
-              },
-              onSettled() {
-                refetchLastTrip();
-              },
+                return;
+              }
+              onTripStarted();
             },
-          );
+            onError(error) {
+              console.log('ERROR : TRIP STARTED: ', error);
+            },
+            onSettled() {
+              refetchLastTrip();
+            },
+          });
         },
       },
     );
@@ -198,5 +200,6 @@ export default function useTracker() {
     refetchLastTrip,
     tripStartTime,
     watcherId,
+    tripInfo,
   };
 }

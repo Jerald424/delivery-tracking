@@ -69,22 +69,26 @@ export default function HMADropdownMolecule({
         onPress={() => setIsOpen(true)}
         style={{ position: 'relative', justifyContent: 'center' }}
       >
-        <HMATextInput
-          {...props}
-          value={value?.[optionalLabel]}
-          {...props}
-          editable={false}
-          style={[
-            {
-              backgroundColor: colors.lightBackground,
-              paddingHorizontal: spacing.sm,
-              paddingTop: spacing.md,
-              paddingBottom: spacing.md,
-              borderRadius: metrics.radius.md,
-              // pointerEvents: 'none',
-            },
-          ]}
-        />
+        <View pointerEvents="none">
+          <HMATextInput
+            {...props}
+            value={value?.[optionalLabel]}
+            {...props}
+            pointerEvents="none"
+            // editable={false}
+            // onPressIn={() => setIsOpen(true)}
+            style={[
+              {
+                backgroundColor: colors.lightBackground,
+                paddingHorizontal: spacing.sm,
+                paddingTop: spacing.md,
+                paddingBottom: spacing.md,
+                borderRadius: metrics.radius.md,
+                pointerEvents: 'none',
+              },
+            ]}
+          />
+        </View>
         <View style={{ position: 'absolute', right: spacing.md }}>
           <HMAIcon name={'arrow_down'} />
         </View>
@@ -107,7 +111,7 @@ export default function HMADropdownMolecule({
                 value={value}
               />
             ))}
-            {val && (
+            {/* {val && (
               <SeparateOption
                 onSelectItem={onSelectItem}
                 isAdd
@@ -119,7 +123,7 @@ export default function HMADropdownMolecule({
                 }}
                 value={value}
               />
-            )}
+            )} */}
             {isEmpty(options) && !val && <NoData />}
           </ScrollView>
           <HMAButton title="CLOSE" onPress={() => setIsOpen(false)} />

@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Alert, ScrollView } from 'react-native';
+import { Alert, ScrollView, View } from 'react-native';
 import TripInProgress from 'src/components/layout/tripInPrograss';
 import HMAButton from 'src/components/styled/atoms/button';
 import HMACard from 'src/components/styled/atoms/card';
@@ -14,9 +14,11 @@ import { checkLocationEnabled } from 'src/function/locationPermission';
 import { useTheme } from 'src/hooks/useTheme';
 import { endTripApi } from './api';
 import useActiveTrip from '../tracker/hooks/useActiveTrip';
+import { HAIRLINE_WIDTH } from 'src/utils/variables';
 
 export default function TripDetails({ navigation, route }) {
   const params = route?.params;
+  const { data, tripStartTime } = useActiveTrip();
   const { control, handleSubmit } = useForm();
   const { spacing, metrics, colors } = useTheme();
   const [isSelected, setIsSelected] = useState('toll');
@@ -100,6 +102,22 @@ export default function TripDetails({ navigation, route }) {
       },
     );
   };
+
+  useEffect(() => {
+    navigation.setOptions({
+      headerTitle: () => (
+        <>
+          <HMAText size="small" color="lightBackground">
+            {data?.active_trip?.trip_name}
+          </HMAText>
+          <HMAText color="background" variant="title">
+            {data?.active_trip?.trip_from} {` `} → {` `}{' '}
+            {data?.active_trip?.trip_to}
+          </HMAText>
+        </>
+      ),
+    });
+  }, []);
   return (
     <Container backgroundColor="lightBackground">
       <ScrollView style={{ flexGrow: 0 }} horizontal>
@@ -132,10 +150,54 @@ export default function TripDetails({ navigation, route }) {
         ))}
       </ScrollView>
       <HMADivider space={'md'} />
-      <HMAForm data={formData} control={control} style={{ flex: 1 }} />
+      <View style={{ flex: 1 }}>
+        <HMAForm data={formData} control={control} />
+        <HMACard
+          style={{ borderRadius: metrics.radius.md, overflow: 'hidden' }}
+        >
+          <View style={{ flexDirection: 'row' }}>
+            <View
+              style={{
+                borderWidth: HAIRLINE_WIDTH,
+                borderColor: colors.border,
+                padding: spacing.md,
+                flex: 1,
+              }}
+            >
+              <HMAText size="small" color="textSecondary">
+                📍 Total Distance
+              </HMAText>
+              <HMAText variant="title">
+                {Number(data?.active_trip?.total_km).toFixed(2)}
+              </HMAText>
+            </View>
+            <View
+              style={{
+                borderWidth: HAIRLINE_WIDTH,
+                borderColor: colors.border,
+                padding: spacing.md,
+                flex: 1,
+              }}
+            >
+              <HMAText size="small" color="textSecondary">
+                📅 Start Time
+              </HMAText>
+              <HMAText variant="title">
+                {tripStartTime?.date !== 'Today' && tripStartTime?.date}
+                {` `} {tripStartTime?.time}
+              </HMAText>
+            </View>
+          </View>
+        </HMACard>
+      </View>
       <HMAButton title="Submit" onPress={handleSubmit(onSubmit)} />
       <TripInProgress isTripStarted={true} />
       <HMAModalLoader isVisible={isPending || isLoadingFetchLatLon} />
     </Container>
   );
 }
+
+/* <HMAText size="small" variant="title">
+            Trip Start Date: {` `} {tripStartTime?.date}
+            {` `} {tripStartTime?.time}
+          </HMAText>*/
