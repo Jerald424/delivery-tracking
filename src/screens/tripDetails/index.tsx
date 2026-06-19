@@ -15,6 +15,7 @@ import { useTheme } from 'src/hooks/useTheme';
 import { endTripApi } from './api';
 import useActiveTrip from '../tracker/hooks/useActiveTrip';
 import { HAIRLINE_WIDTH } from 'src/utils/variables';
+import { jsDateToTimeFormat } from 'src/function/dateConversion';
 
 export default function TripDetails({ navigation, route }) {
   const params = route?.params;
@@ -120,7 +121,11 @@ export default function TripDetails({ navigation, route }) {
   }, []);
   return (
     <Container backgroundColor="lightBackground">
-      <ScrollView style={{ flexGrow: 0 }} horizontal>
+      <ScrollView
+        style={{ flexGrow: 0 }}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+      >
         {types?.map(type => (
           <HMACard
             onPress={() => setIsSelected(type?.id)}
@@ -180,11 +185,43 @@ export default function TripDetails({ navigation, route }) {
               }}
             >
               <HMAText size="small" color="textSecondary">
+                👨🏻‍✈️ Driver
+              </HMAText>
+              <HMAText variant="title">
+                {data?.active_trip?.driver_name}
+              </HMAText>
+            </View>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <View
+              style={{
+                borderWidth: HAIRLINE_WIDTH,
+                borderColor: colors.border,
+                padding: spacing.md,
+                flex: 1,
+              }}
+            >
+              <HMAText size="small" color="textSecondary">
                 📅 Start Time
               </HMAText>
               <HMAText variant="title">
                 {tripStartTime?.date !== 'Today' && tripStartTime?.date}
                 {` `} {tripStartTime?.time}
+              </HMAText>
+            </View>
+            <View
+              style={{
+                borderWidth: HAIRLINE_WIDTH,
+                borderColor: colors.border,
+                padding: spacing.md,
+                flex: 1,
+              }}
+            >
+              <HMAText size="small" color="textSecondary">
+                📅 End Time
+              </HMAText>
+              <HMAText variant="title">
+                {jsDateToTimeFormat(new Date())}
               </HMAText>
             </View>
           </View>

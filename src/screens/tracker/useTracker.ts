@@ -143,6 +143,7 @@ export default function useTracker() {
             latitude: location?.coords?.latitude,
             longitude: location?.coords?.longitude,
             ...tripInfo?.current,
+            ...tripInfo?.current?.driver_id,
             driver_id: tripInfo?.current?.driver_id?.id,
           };
           console.log('tripData: ', tripData);
