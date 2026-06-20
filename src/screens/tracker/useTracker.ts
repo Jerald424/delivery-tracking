@@ -24,7 +24,7 @@ const getDistance = (coord1, coord2) => {
 };
 
 const MIN_DISTANCE_METRES = 50; // only add point if moved at least 5m
-const interval = 60000;
+const interval = 30000;
 const delay = (ms: number) =>
   new Promise(resolve => setTimeout(() => resolve('OK'), ms));
 

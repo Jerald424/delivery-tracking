@@ -19,11 +19,10 @@ import { jsDateToTimeFormat } from 'src/function/dateConversion';
 
 export default function TripDetails({ navigation, route }) {
   const params = route?.params;
-  const { data, tripStartTime } = useActiveTrip();
+  const { data, tripStartTime, refetch } = useActiveTrip();
   const { control, handleSubmit } = useForm();
   const { spacing, metrics, colors } = useTheme();
   const [isSelected, setIsSelected] = useState('toll');
-  const { refetch } = useActiveTrip();
   const { mutate, isPending } = useMutation({
     mutationKey: ['end/trip'],
     mutationFn: endTripApi,
@@ -105,6 +104,7 @@ export default function TripDetails({ navigation, route }) {
   };
 
   useEffect(() => {
+    refetch();
     navigation.setOptions({
       headerTitle: () => (
         <>
