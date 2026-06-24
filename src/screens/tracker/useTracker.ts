@@ -123,6 +123,7 @@ export default function useTracker() {
         const newPoint = {
           latitude: coords.latitude,
           longitude: coords.longitude,
+          ...coords,
         };
 
         onAddNewCoords(coords);
@@ -139,9 +140,11 @@ export default function useTracker() {
       {
         onSuccess(location) {
           console.log('FETCH ON TRIP START', location);
+          if (!location?.coords) return;
           const tripData = {
             latitude: location?.coords?.latitude,
             longitude: location?.coords?.longitude,
+            ...location?.coords,
             ...tripInfo?.current,
             ...tripInfo?.current?.driver_id,
             driver_id: tripInfo?.current?.driver_id?.id,
