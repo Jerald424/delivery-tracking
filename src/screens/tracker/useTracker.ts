@@ -10,6 +10,7 @@ import {
 } from './apis';
 import { checkLocationEnabled } from 'src/function/locationPermission';
 import useActiveTrip from './hooks/useActiveTrip';
+import useAlignCoords from './alignCoords/useAlignCoords';
 
 const getDistance = (coord1, coord2) => {
   const R = 6371000;
@@ -62,7 +63,10 @@ export default function useTracker() {
     mutationFn: checkLocationEnabled,
   });
 
+  const { coords, loading } = useAlignCoords(routeCoords);
+
   console.log('routeCoords: ', routeCoords);
+  console.log('coords, loading: ', coords, loading);
 
   const onEnd = () => {
     clearInterval(watcherId.current);
@@ -205,5 +209,6 @@ export default function useTracker() {
     tripStartTime,
     watcherId,
     tripInfo,
+    coords,
   };
 }

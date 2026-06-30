@@ -16,8 +16,10 @@ import { endTripApi } from './api';
 import useActiveTrip from '../tracker/hooks/useActiveTrip';
 import { HAIRLINE_WIDTH } from 'src/utils/variables';
 import { jsDateToTimeFormat } from 'src/function/dateConversion';
+import HMAModalTemplate from 'src/components/styled/template/modal';
 
 export default function TripDetails({ navigation, route }) {
+  const [isOpen, setIsOpen] = useState(false);
   const params = route?.params;
   const { data, tripStartTime, refetch } = useActiveTrip();
   const { control, handleSubmit } = useForm();
@@ -173,7 +175,7 @@ export default function TripDetails({ navigation, route }) {
                 📍 Total Distance
               </HMAText>
               <HMAText variant="title">
-                {Number(data?.active_trip?.total_km).toFixed(2)}
+                {Number(data?.active_trip?.total_km).toFixed(2)} Km
               </HMAText>
             </View>
             <View
@@ -227,9 +229,21 @@ export default function TripDetails({ navigation, route }) {
           </View>
         </HMACard>
       </View>
-      <HMAButton title="Submit" onPress={handleSubmit(onSubmit)} />
+      <HMAButton title="Submit" onPress={() => setIsOpen(true)} />
       <TripInProgress isTripStarted={true} />
       <HMAModalLoader isVisible={isPending || isLoadingFetchLatLon} />
+      <HMAModalTemplate
+        isVisible={!!isOpen}
+        descriptionProps={{
+          children: 'Are you sure do you want to submit',
+        }}
+        cancelTextProps={{
+          onPress: () => setIsOpen(false),
+        }}
+        okTextProps={{
+          onPress: handleSubmit(onSubmit),
+        }}
+      />
     </Container>
   );
 }

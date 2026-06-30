@@ -34,7 +34,10 @@ function Tracker() {
     tripStartTime,
     watcherId,
     tripInfo,
+    coords,
   } = useTracker();
+
+  console.log('routeCoords: ', routeCoords);
 
   useEffect(() => {
     if (lastTripDetails?.has_active_trip) resumeTrip();
@@ -108,7 +111,7 @@ function Tracker() {
           style={[{ flex: 1 }]}
         >
           <Polyline
-            coordinates={routeCoords}
+            coordinates={coords}
             strokeColor="#E85D24"
             strokeWidth={4}
           />
