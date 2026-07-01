@@ -14,8 +14,12 @@ import { useTheme } from 'src/hooks/useTheme';
 import useTracker from './useTracker';
 import HMAModalLoader from 'src/components/styled/molecules/loader/modalLoader';
 import PreTripDetails from '../preTripDetails';
+import { useKeepAwake } from '@sayem314/react-native-keep-awake';
 
 function Tracker() {
+  console.log('useKeepAwake:', useKeepAwake);
+  useKeepAwake();
+
   const { spacing, colors, metrics } = useTheme();
   const {
     isOpen,
