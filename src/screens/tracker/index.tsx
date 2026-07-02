@@ -38,7 +38,7 @@ function Tracker() {
     tripStartTime,
     watcherId,
     tripInfo,
-    coords,
+    // coords,
   } = useTracker();
 
   console.log('routeCoords: ', routeCoords);
@@ -115,7 +115,7 @@ function Tracker() {
           style={[{ flex: 1 }]}
         >
           <Polyline
-            coordinates={coords}
+            coordinates={routeCoords}
             strokeColor="#E85D24"
             strokeWidth={4}
           />

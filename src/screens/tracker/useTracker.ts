@@ -66,7 +66,7 @@ export default function useTracker() {
   const { coords, loading } = useAlignCoords(routeCoords);
 
   console.log('routeCoords: ', routeCoords);
-  console.log('coords, loading: ', coords, loading);
+  // console.log('coords, loading: ', coords, loading);
 
   const onEnd = () => {
     clearInterval(watcherId.current);
@@ -209,6 +209,6 @@ export default function useTracker() {
     tripStartTime,
     watcherId,
     tripInfo,
-    coords,
+    // coords,
   };
 }
